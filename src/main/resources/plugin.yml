@@ -1,0 +1,8 @@
+name: LevelTools
+version: 1.6.5
+main: me.Hayden.LevelTools.Main
+softdepend: [AutoSell]
+api-version: 1.13
+commands:
+  leveltools:
+    description: main command

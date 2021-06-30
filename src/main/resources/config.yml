@@ -1,0 +1,176 @@
+
+#  ██╗░░░░░███████╗██╗░░░██╗███████╗██╗░░░░░████████╗░█████╗░░█████╗░██╗░░░░░░██████╗
+#  ██║░░░░░██╔════╝██║░░░██║██╔════╝██║░░░░░╚══██╔══╝██╔══██╗██╔══██╗██║░░░░░██╔════╝
+#  ██║░░░░░█████╗░░╚██╗░██╔╝█████╗░░██║░░░░░░░░██║░░░██║░░██║██║░░██║██║░░░░░╚█████╗░
+#  ██║░░░░░██╔══╝░░░╚████╔╝░██╔══╝░░██║░░░░░░░░██║░░░██║░░██║██║░░██║██║░░░░░░╚═══██╗
+#  ███████╗███████╗░░╚██╔╝░░███████╗███████╗░░░██║░░░╚█████╔╝╚█████╔╝███████╗██████╔╝
+#  ╚══════╝╚══════╝░░░╚═╝░░░╚══════╝╚══════╝░░░╚═╝░░░░╚════╝░░╚════╝░╚══════╝╚═════╝░
+
+settings:
+  #What to replace the %xp_needed% placeholder with once the user has reached max level
+  maxlevel: "&a&lMAX"
+  #Changing this requires a server restart
+  autosell-hook: false
+  #Enabling this means that this plugin will take full control over the handling of the items lore. All lore/enchant displaying
+  #options in your tokenenchant config will be disabled.
+  tokenenchant-hook:
+    enabled: false
+    lore:
+      prefix: "&7"
+  crazyenchant-hook:
+    enabled: false
+    lore:
+      prefix: "&7"
+
+#Advanced features require a full server reload to take effect
+#List of event priorities w/ explanations https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/EventPriority.html
+advanced:
+  blockbreak-event-priority: "MONITOR"
+
+pickaxe:
+  enabled: true
+  lore:
+    - "&7Blocks: &b%blocks%"
+    - "&7Level: &b%level% &8(&a%percentage%%&8)"
+    - "&7XP: &c%xp% / %xp_needed%"
+
+  #How much XP each block should give?
+  blocks:
+    - STONE:1
+  disabled_worlds:
+    - "example"
+
+  levels:
+    1:
+      xp-needed: 0
+      rewards:
+        - "[cmd] eco give %player% 100"
+        - "[message] &bCongrats %player% you have reached level 1 on your pickaxe"
+        - "[enchant] DIG_SPEED 1"
+    2:
+      xp-needed: 100
+      rewards:
+        - "[cmd] eco give %player% 200"
+
+
+axe:
+  enabled: true
+  lore:
+    - "&7Blocks: &b%blocks%"
+    - "&7Level: &b%level% &8(&a%percentage%%&8)"
+    - "&7XP: &c%xp% / %xp_needed%"
+
+  #How much XP each block should give?
+  #The name of the blocks can vary between minecraft versions Ex: its LOG on 1.8 and OAK_LOG on 1.16
+  blocks:
+    - OAK_LOG:1
+  disabled_worlds:
+    - "example"
+
+  levels:
+    1:
+      xp-needed: 0
+      rewards:
+        - "[cmd] eco give %player% 100"
+        - "[message] &bCongrats %player% you have reached level 1 on your axe"
+        - "[enchant] DIG_SPEED 1"
+    2:
+      xp-needed: 100
+      rewards:
+        - "[cmd] eco give %player% 200"
+
+shovel:
+  enabled: true
+  lore:
+    - "&7Blocks: &b%blocks%"
+    - "&7Level: &b%level% &8(&a%percentage%%&8)"
+    - "&7XP: &c%xp% / %xp_needed%"
+
+  #How much XP each block should give?
+
+  blocks:
+    - GRASS_BLOCK:2
+    - DIRT:1
+  disabled_worlds:
+    - "example"
+
+  levels:
+    1:
+      xp-needed: 0
+      rewards:
+        - "[cmd] eco give %player% 100"
+        - "[message] &bCongrats %player% you have reached level 1 on your shovel"
+        - "[enchant] DIG_SPEED 1"
+    2:
+      xp-needed: 100
+      rewards:
+        - "[cmd] eco give %player% 200"
+
+#PVP ITEMS
+sword:
+  enabled: true
+  onlyplayerdamage: false
+  lore:
+    - "&7DAMAGE: &c%damage% / %damage_needed%"
+    - "&7Level: &b%level% &8(&a%percentage%%&8)"
+
+  disabled_worlds:
+    - "example"
+
+  levels:
+    1:
+      damage-needed: 0
+      rewards:
+        - "[cmd] eco give %player% 100"
+        - "[message] &bCongrats %player% you have reached level 1 on your sword"
+        - "[enchant] DAMAGE_ALL 1"
+    2:
+      damage-needed: 100
+      rewards:
+        - "[cmd] eco give %player% 200"
+
+bow:
+  enabled: true
+  onlyplayerdamage: false
+  lore:
+    - "&7DAMAGE: &c%damage% / %damage_needed%"
+    - "&7Level: &b%level% &8(&a%percentage%%&8)"
+
+  disabled_worlds:
+    - "example"
+
+  levels:
+    1:
+      damage-needed: 0
+      rewards:
+        - "[cmd] eco give %player% 100"
+        - "[message] &bCongrats %player% you have reached level 1 on your bow"
+        - "[enchant] POWER 1"
+    2:
+      damage-needed: 100
+      rewards:
+        - "[cmd] eco give %player% 200"
+
+#1.16 items can be configured below this line
+#If you are on 1.8 leave everything below here disabled
+crossbow:
+  enabled: false
+  onlyplayerdamage: false
+  lore:
+    - "&7DAMAGE: &c%damage% / %damage_needed%"
+    - "&7Level: &b%level% &8(&a%percentage%%&8)"
+
+  disabled_worlds:
+    - "example"
+
+  levels:
+    1:
+      damage-needed: 0
+      rewards:
+        - "[cmd] eco give %player% 100"
+        - "[message] &bCongrats %player% you have reached level 1 on your crossbow"
+        - "[enchant] POWER 1"
+    2:
+      damage-needed: 100
+      rewards:
+        - "[cmd] eco give %player% 200"

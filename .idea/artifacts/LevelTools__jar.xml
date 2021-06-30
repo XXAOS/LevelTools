@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="LevelTools+:jar">
+    <output-path>$USER_HOME$/Desktop/testserver/plugins</output-path>
+    <root id="archive" name="LevelTools+.jar">
+      <element id="module-output" name="LevelTools+" />
+      <element id="extracted-dir" path="$USER_HOME$/Desktop/AutoSellAPI-1.2.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/tr7zw/functional-annotations/0.1-SNAPSHOT/functional-annotations-0.1-20210226.114524-6.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/tr7zw/item-nbt-api/2.7.1/item-nbt-api-2.7.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

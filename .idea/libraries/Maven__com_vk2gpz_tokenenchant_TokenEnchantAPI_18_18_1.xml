@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.vk2gpz.tokenenchant:TokenEnchantAPI:18.18.1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/vk2gpz/tokenenchant/TokenEnchantAPI/18.18.1/TokenEnchantAPI-18.18.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/vk2gpz/tokenenchant/TokenEnchantAPI/18.18.1/TokenEnchantAPI-18.18.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/vk2gpz/tokenenchant/TokenEnchantAPI/18.18.1/TokenEnchantAPI-18.18.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
