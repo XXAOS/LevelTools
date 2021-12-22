@@ -4,22 +4,24 @@ import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.vk2gpz.tokenenchant.api.CEHandler;
 import com.vk2gpz.tokenenchant.api.TokenEnchantAPI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import me.Hayden.LevelTools.Main;
+import me.Hayden.LevelTools.LevelTools;
+import me.Hayden.LevelTools.other.ProgressBar;
 import me.badbones69.crazyenchantments.api.CrazyEnchantments;
 import me.badbones69.crazyenchantments.api.objects.CEnchantment;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class BlockBreakHandler {
     private static String color(String s) {
@@ -27,101 +29,86 @@ public class BlockBreakHandler {
     }
 
     public static void handle(Block block, Player player, String nameinconfig) {
-        Map<Enchantment, Integer> enchantstoadd = new HashMap<Enchantment, Integer>();
+        Map<Enchantment, Integer> enchantstoadd = new HashMap<>();
+        Map<CEnchantment, Integer> ce_enchantstoadd = new HashMap<>();
         int xptonextlevel = 0;
-        //If a player is holding air?? stop him!!!
-        if (player.getItemInHand() == null) {
+        if (player.getItemInHand() == null)
             return;
-        }
-
-        if (Main.plugin.getConfig().getBoolean(nameinconfig + ".enabled") == true) {
-
-            for (String s : Main.plugin.getConfig().getStringList(nameinconfig + ".disabled_worlds")) {
-                if (player.getWorld().getName().equals(s)){ return; }
+        if (LevelTools.plugin.getConfig().getBoolean(nameinconfig + ".enabled") == true) {
+            for (String s : LevelTools.plugin.getConfig().getStringList(nameinconfig + ".disabled_worlds")) {
+                if (player.getWorld().getName().equals(s))
+                    return;
             }
-            //ADD BLOCKS TO NBT
             NBTItem nbtitem = new NBTItem(player.getItemInHand());
-            nbtitem.setInteger("blocks", nbtitem.getInteger("blocks") + 1);
-            //ADD XP TO NBT
-
-
-            for (String s : Main.plugin.getConfig().getStringList(nameinconfig + ".blocks")) {
+            nbtitem.setInteger("blocks", Integer.valueOf(nbtitem.getInteger("blocks").intValue() + 1));
+            for (String s : LevelTools.plugin.getConfig().getStringList(nameinconfig + ".blocks")) {
                 String[] split = s.split(":");
-                Material b = XMaterial.matchXMaterial(split[0]).get().parseMaterial();
-                if (block.getType() == b) {
-                    nbtitem.setInteger("xp", nbtitem.getInteger("xp") + Integer.valueOf(split[1]));
-                }
+                Material b = ((XMaterial)XMaterial.matchXMaterial(split[0]).get()).parseMaterial();
+                if (block.getType() == b)
+                    nbtitem.setInteger("xp", Integer.valueOf(nbtitem.getInteger("xp").intValue() + Integer.valueOf(split[1]).intValue()));
             }
-            //LEVEL HANDLER
-            for (String s : Main.plugin.getConfig().getConfigurationSection(nameinconfig + ".levels").getKeys(false)) {
-                int xpneeded = Main.plugin.getConfig().getInt(nameinconfig + ".levels." + s + ".xp-needed");
-                if (nbtitem.getInteger("xp") >= xpneeded) {
+            for (String s : LevelTools.plugin.getConfig().getConfigurationSection(nameinconfig + ".levels").getKeys(false)) {
+                int xpneeded = LevelTools.plugin.getConfig().getInt(nameinconfig + ".levels." + s + ".xp-needed");
+                if (nbtitem.getInteger("xp").intValue() >= xpneeded) {
                     Integer i = nbtitem.getInteger("level");
                     Integer j = Integer.valueOf(s);
-                    if (i.equals(j)) {
+                    if (i.equals(j))
                         continue;
-                    }
-                    if (i > j) {
+                    if (i.intValue() > j.intValue())
                         continue;
-                    }
                     nbtitem.setInteger("level", Integer.valueOf(s));
-                    for (String reward : Main.plugin.getConfig().getStringList(nameinconfig + ".levels." + s + ".rewards")) {
+                    for (String reward : LevelTools.plugin.getConfig().getStringList(nameinconfig + ".levels." + s + ".rewards")) {
                         String[] splits = reward.split(" ", 2);
                         String prefix = splits[0];
-                        if (prefix.equalsIgnoreCase("[cmd]")) {
-                            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), splits[1]
+                        if (prefix.equalsIgnoreCase("[cmd]"))
+                            Bukkit.dispatchCommand((CommandSender)Bukkit.getServer().getConsoleSender(), splits[1]
                                     .replace("%player%", player.getName()));
-                        }
-                        if (prefix.equalsIgnoreCase("[message]")) {
+                        if (prefix.equalsIgnoreCase("[message]"))
                             player.sendMessage(color(splits[1].replace("%player%", player.getName())));
-                        }
                         if (prefix.equalsIgnoreCase("[enchant]")) {
                             String[] splitench = splits[1].split(" ");
-                            enchantstoadd.put(XEnchantment.matchXEnchantment(splitench[0]).get().parseEnchantment(), Integer.valueOf(splitench[1]));
+                            enchantstoadd.put(((XEnchantment)XEnchantment.matchXEnchantment(splitench[0]).get()).parseEnchantment(), Integer.valueOf(splitench[1]));
                         }
                     }
                 }
             }
-            //APPLY NBT TO LORE
-            if (Main.plugin.getConfig().contains(nameinconfig + ".levels." + (nbtitem.getInteger("level") + 1) + ".xp-needed")) {
-                xptonextlevel = Main.plugin.getConfig().getInt(nameinconfig + ".levels." + (nbtitem.getInteger("level") + 1) + ".xp-needed");
-            }
+            if (LevelTools.plugin.getConfig().contains(nameinconfig + ".levels." + (nbtitem.getInteger("level").intValue() + 1) + ".xp-needed"))
+                xptonextlevel = LevelTools.plugin.getConfig().getInt(nameinconfig + ".levels." + (nbtitem.getInteger("level").intValue() + 1) + ".xp-needed");
             ItemMeta meta = nbtitem.getItem().getItemMeta();
             List<String> newlore = new ArrayList<>();
-
-            //Handle tokenenchant enchants/lores and whatever
-            if (Main.tokenenchant_hook == true) {
-                TokenEnchantAPI api = TokenEnchantAPI.getInstance();
-                Map<CEHandler, Integer> enchantments = api.getEnchantments(player.getItemInHand());
+            if (LevelTools.tokenenchant_hook == true) {
+                Map<CEHandler, Integer> enchantments = LevelTools.tokenenchant_api.getEnchantments(player.getItemInHand());
                 List<String> telore = new ArrayList<>();
                 enchantments.forEach((enc, level) -> {
-                    if (enc.isVanilla()) {
+                    if (enc.isVanilla())
                         return;
-                    }
-                    String lore = enc.getLoreEntry(level, true, false, "");
-                    newlore.add(color(Main.plugin.getConfig().getString("settings.tokenenchant-hook.lore.prefix") + lore));
+                    String lore = enc.getLoreEntry(level.intValue(), true, false, "");
+                    newlore.add(color(LevelTools.plugin.getConfig().getString("settings.tokenenchant-hook.lore.prefix") + lore));
                 });
             }
-            Map<CEnchantment, Integer> crazyenchant = new HashMap<CEnchantment, Integer>();
-            if (Main.crazyenchant_hook == true) {
-                CrazyEnchantments api = CrazyEnchantments.getInstance();
-                Map<CEnchantment, Integer> enchantments = api.getEnchantments(player.getItemInHand());
+            Map<CEnchantment, Integer> crazyenchant = new HashMap<>();
+            if (LevelTools.crazyenchant_hook == true) {
+                Map<CEnchantment, Integer> enchantments = LevelTools.crazyenchant_api.getEnchantments(player.getItemInHand());
                 List<String> telore = new ArrayList<>();
                 enchantments.forEach((enc, level) -> {
                     String lore = enc.getCustomName();
-                    crazyenchant.put(enc, enc.getLevel(player.getItemInHand()));
-                    newlore.add(color(Main.plugin.getConfig().getString("settings.crazyenchant-hook.lore.prefix") + lore));
+                    crazyenchant.put(enc, Integer.valueOf(enc.getLevel(player.getItemInHand())));
+                    newlore.add(color(LevelTools.plugin.getConfig().getString("settings.crazyenchant-hook.lore.prefix") + lore));
                 });
             }
-            //Apply nbt to ore
-            for (String s : Main.plugin.getConfig().getStringList(nameinconfig + ".lore")) {
-                s = s.replace("%blocks%", Integer.toString(nbtitem.getInteger("blocks")));
-                s = s.replace("%xp%", Integer.toString(nbtitem.getInteger("xp")));
-                s = s.replace("%level%", Integer.toString(nbtitem.getInteger("level")));
+            for (String s : LevelTools.plugin.getConfig().getStringList(nameinconfig + ".lore")) {
+                s = s.replace("%blocks%", Integer.toString(nbtitem.getInteger("blocks").intValue()));
+                s = s.replace("%xp%", Integer.toString(nbtitem.getInteger("xp").intValue()));
+                s = s.replace("%progressbar%", ProgressBar.getProgressBar(nbtitem.getInteger("xp").intValue(), xptonextlevel));
+                s = s.replace("%level%", Integer.toString(nbtitem.getInteger("level").intValue()));
                 Integer xp = nbtitem.getInteger("xp");
-                if (xptonextlevel == 0) { s = s.replace("%xp_needed%", color(Main.plugin.getConfig().getString("settings.maxlevel"))); } else { s = s.replace("%xp_needed%", Integer.toString(xptonextlevel)); }
+                if (xptonextlevel == 0) {
+                    s = s.replace("%xp_needed%", color(LevelTools.plugin.getConfig().getString("settings.maxlevel")));
+                } else {
+                    s = s.replace("%xp_needed%", Integer.toString(xptonextlevel));
+                }
                 if (xptonextlevel != 0) {
-                    int percentage = (xp * 100 + (xptonextlevel >> 1)) / xptonextlevel;
+                    int percentage = (xp.intValue() * 100 + (xptonextlevel >> 1)) / xptonextlevel;
                     s = s.replace("%percentage%", Integer.toString(percentage));
                 } else {
                     s = s.replace("%percentage%", Integer.toString(100));
@@ -129,128 +116,105 @@ public class BlockBreakHandler {
                 newlore.add(color(s));
             }
             meta.setLore(newlore);
-            //Check if a enchant level needs to be added
             for (Map.Entry<Enchantment, Integer> entry : enchantstoadd.entrySet()) {
                 Enchantment e = entry.getKey();
-                Integer currentench = player.getItemInHand().getEnchantmentLevel(e);
-                meta.addEnchant(e, currentench + entry.getValue(), true);
+                Integer currentench = Integer.valueOf(player.getItemInHand().getEnchantmentLevel(e));
+                meta.addEnchant(e, currentench.intValue() + ((Integer)entry.getValue()).intValue(), true);
             }
-            //set meta and apply nbt to item in players hand
             nbtitem.getItem().setItemMeta(meta);
             nbtitem.applyNBT(player.getItemInHand());
             for (Map.Entry<CEnchantment, Integer> entry : crazyenchant.entrySet()) {
-                CrazyEnchantments api = CrazyEnchantments.getInstance();
                 CEnchantment e = entry.getKey();
-                Integer currentench = api.getLevel(player.getItemInHand(), e);
-                api.addEnchantment(player.getItemInHand(), e, currentench + entry.getValue());
+                Integer currentench = Integer.valueOf(LevelTools.crazyenchant_api.getLevel(player.getItemInHand(), e));
+                LevelTools.crazyenchant_api.addEnchantment(player.getItemInHand(), e, currentench.intValue() + ((Integer)entry.getValue()).intValue());
             }
         }
-
-
     }
 
     public static void handle(List<Block> blocks, Player player, String nameinconfig) {
-
-        Map<Enchantment, Integer> enchantstoadd = new HashMap<Enchantment, Integer>();
+        Map<Enchantment, Integer> enchantstoadd = new HashMap<>();
         int xptonextlevel = 0;
         int blocksbroken = 1;
-        //If a player is holding air?? stop him!!!
-        if (player.getItemInHand() == null) {
+        if (player.getItemInHand() == null)
             return;
-        }
-
-        if (Main.plugin.getConfig().getBoolean(nameinconfig + ".enabled") == true) {
-            for (String s : Main.plugin.getConfig().getStringList(nameinconfig + ".disabled_worlds")) {
-                if (player.getWorld().getName().equals(s)){ return; }
+        if (LevelTools.plugin.getConfig().getBoolean(nameinconfig + ".enabled") == true) {
+            for (String s : LevelTools.plugin.getConfig().getStringList(nameinconfig + ".disabled_worlds")) {
+                if (player.getWorld().getName().equals(s))
+                    return;
             }
-            for (Block block : blocks) {
+            for (Block block : blocks)
                 blocksbroken++;
-            }
-
-            //ADD BLOCKS TO NBT
             NBTItem nbtitem = new NBTItem(player.getItemInHand());
-            nbtitem.setInteger("blocks", nbtitem.getInteger("blocks") + blocksbroken);
-            //ADD XP TO NBT
-
+            nbtitem.setInteger("blocks", Integer.valueOf(nbtitem.getInteger("blocks").intValue() + blocksbroken));
             for (Block b : blocks) {
-                for (String s : Main.plugin.getConfig().getStringList(nameinconfig + ".blocks")) {
+                for (String s : LevelTools.plugin.getConfig().getStringList(nameinconfig + ".blocks")) {
                     String[] split = s.split(":");
-                    Material block = XMaterial.matchXMaterial(split[0]).get().parseMaterial();
-                    if (block == b.getType()) {
-                        nbtitem.setInteger("xp", nbtitem.getInteger("xp") + Integer.valueOf(split[1]));
-                    }
+                    Material block = ((XMaterial)XMaterial.matchXMaterial(split[0]).get()).parseMaterial();
+                    if (block == b.getType())
+                        nbtitem.setInteger("xp", Integer.valueOf(nbtitem.getInteger("xp").intValue() + Integer.valueOf(split[1]).intValue()));
                 }
             }
-            //LEVEL HANDLER
-            for (String s : Main.plugin.getConfig().getConfigurationSection(nameinconfig + ".levels").getKeys(false)) {
-                int xpneeded = Main.plugin.getConfig().getInt(nameinconfig + ".levels." + s + ".xp-needed");
-                if (nbtitem.getInteger("xp") >= xpneeded) {
+            for (String s : LevelTools.plugin.getConfig().getConfigurationSection(nameinconfig + ".levels").getKeys(false)) {
+                int xpneeded = LevelTools.plugin.getConfig().getInt(nameinconfig + ".levels." + s + ".xp-needed");
+                if (nbtitem.getInteger("xp").intValue() >= xpneeded) {
                     Integer i = nbtitem.getInteger("level");
                     Integer j = Integer.valueOf(s);
-                    if (i.equals(j)) {
+                    if (i.equals(j))
                         continue;
-                    }
-                    if (i > j) {
+                    if (i.intValue() > j.intValue())
                         continue;
-                    }
                     nbtitem.setInteger("level", Integer.valueOf(s));
-                    for (String reward : Main.plugin.getConfig().getStringList(nameinconfig + ".levels." + s + ".rewards")) {
+                    for (String reward : LevelTools.plugin.getConfig().getStringList(nameinconfig + ".levels." + s + ".rewards")) {
                         String[] splits = reward.split(" ", 2);
                         String prefix = splits[0];
-                        if (prefix.equalsIgnoreCase("[cmd]")) {
-                            Bukkit.dispatchCommand(Bukkit.getServer().getConsoleSender(), splits[1]
+                        if (prefix.equalsIgnoreCase("[cmd]"))
+                            Bukkit.dispatchCommand((CommandSender)Bukkit.getServer().getConsoleSender(), splits[1]
                                     .replace("%player%", player.getName()));
-                        }
-                        if (prefix.equalsIgnoreCase("[message]")) {
+                        if (prefix.equalsIgnoreCase("[message]"))
                             player.sendMessage(color(splits[1].replace("%player%", player.getName())));
-                        }
                         if (prefix.equalsIgnoreCase("[enchant]")) {
                             String[] splitench = splits[1].split(" ");
-                            enchantstoadd.put(XEnchantment.matchXEnchantment(splitench[0]).get().parseEnchantment(), Integer.valueOf(splitench[1]));
+                            enchantstoadd.put(((XEnchantment)XEnchantment.matchXEnchantment(splitench[0]).get()).parseEnchantment(), Integer.valueOf(splitench[1]));
                         }
                     }
                 }
             }
-            //APPLY NBT TO LORE
-            if (Main.plugin.getConfig().contains(nameinconfig + ".levels." + (nbtitem.getInteger("level") + 1) + ".xp-needed")) {
-                xptonextlevel = Main.plugin.getConfig().getInt(nameinconfig + ".levels." + (nbtitem.getInteger("level") + 1) + ".xp-needed");
-            }
+            if (LevelTools.plugin.getConfig().contains(nameinconfig + ".levels." + (nbtitem.getInteger("level").intValue() + 1) + ".xp-needed"))
+                xptonextlevel = LevelTools.plugin.getConfig().getInt(nameinconfig + ".levels." + (nbtitem.getInteger("level").intValue() + 1) + ".xp-needed");
             ItemMeta meta = nbtitem.getItem().getItemMeta();
             List<String> newlore = new ArrayList<>();
-
-            //Handle tokenenchant enchants/lores and whatever
-            if (Main.tokenenchant_hook == true) {
-                TokenEnchantAPI api = TokenEnchantAPI.getInstance();
-                Map<CEHandler, Integer> enchantments = api.getEnchantments(player.getItemInHand());
+            if (LevelTools.tokenenchant_hook == true) {
+                Map<CEHandler, Integer> enchantments = LevelTools.tokenenchant_api.getEnchantments(player.getItemInHand());
                 List<String> telore = new ArrayList<>();
                 enchantments.forEach((enc, level) -> {
-                    if (enc.isVanilla()) {
+                    if (enc.isVanilla())
                         return;
-                    }
-                    String lore = enc.getLoreEntry(level, true, false, "");
-                    newlore.add(color(Main.plugin.getConfig().getString("settings.tokenenchant-hook.lore.prefix") + lore));
+                    String lore = enc.getLoreEntry(level.intValue(), true, false, "");
+                    newlore.add(color(LevelTools.plugin.getConfig().getString("settings.tokenenchant-hook.lore.prefix") + lore));
                 });
             }
-            //Handle Crazyenchant lores
-            Map<CEnchantment, Integer> crazyenchant = new HashMap<CEnchantment, Integer>();
-            if (Main.crazyenchant_hook == true) {
-                CrazyEnchantments api = CrazyEnchantments.getInstance();
-                Map<CEnchantment, Integer> enchantments = api.getEnchantments(player.getItemInHand());
+            Map<CEnchantment, Integer> crazyenchant = new HashMap<>();
+            if (LevelTools.crazyenchant_hook == true) {
+                Map<CEnchantment, Integer> enchantments = LevelTools.crazyenchant_api.getEnchantments(player.getItemInHand());
                 List<String> telore = new ArrayList<>();
                 enchantments.forEach((enc, level) -> {
                     String lore = enc.getCustomName();
-                    crazyenchant.put(enc, enc.getLevel(player.getItemInHand()));
+                    crazyenchant.put(enc, Integer.valueOf(enc.getLevel(player.getItemInHand())));
                 });
             }
-            //Apply nbt to ore
-            for (String s : Main.plugin.getConfig().getStringList(nameinconfig + ".lore")) {
-                s = s.replace("%blocks%", Integer.toString(nbtitem.getInteger("blocks")));
-                s = s.replace("%xp%", Integer.toString(nbtitem.getInteger("xp")));
-                s = s.replace("%level%", Integer.toString(nbtitem.getInteger("level")));
+            for (String s : LevelTools.plugin.getConfig().getStringList(nameinconfig + ".lore")) {
+                s = s.replace("%blocks%", Integer.toString(nbtitem.getInteger("blocks").intValue()));
+                s = s.replace("%xp%", Integer.toString(nbtitem.getInteger("xp").intValue()));
+                s = s.replace("%progressbar%", ProgressBar.getProgressBar(nbtitem.getInteger("xp").intValue(), xptonextlevel));
+                s = s.replace("%level%", Integer.toString(nbtitem.getInteger("level").intValue()));
                 Integer xp = nbtitem.getInteger("xp");
-                if (xptonextlevel == 0) { s = s.replace("%xp_needed%", color(Main.plugin.getConfig().getString("settings.maxlevel"))); } else { s = s.replace("%xp_needed%", Integer.toString(xptonextlevel)); }
+                if (xptonextlevel == 0) {
+                    s = s.replace("%xp_needed%", color(LevelTools.plugin.getConfig().getString("settings.maxlevel")));
+                } else {
+                    s = s.replace("%xp_needed%", Integer.toString(xptonextlevel));
+                }
                 if (xptonextlevel != 0) {
-                    int percentage = (xp * 100 + (xptonextlevel >> 1)) / xptonextlevel;
+                    int percentage = (xp.intValue() * 100 + (xptonextlevel >> 1)) / xptonextlevel;
                     s = s.replace("%percentage%", Integer.toString(percentage));
                 } else {
                     s = s.replace("%percentage%", Integer.toString(100));
@@ -258,23 +222,18 @@ public class BlockBreakHandler {
                 newlore.add(color(s));
             }
             meta.setLore(newlore);
-            //Check if a enchant level needs to be added
             for (Map.Entry<Enchantment, Integer> entry : enchantstoadd.entrySet()) {
                 Enchantment e = entry.getKey();
-                Integer currentench = player.getItemInHand().getEnchantmentLevel(e);
-                meta.addEnchant(e, currentench + entry.getValue(), true);
+                Integer currentench = Integer.valueOf(player.getItemInHand().getEnchantmentLevel(e));
+                meta.addEnchant(e, currentench.intValue() + ((Integer)entry.getValue()).intValue(), true);
             }
-            //set meta and apply nbt to item in players hand
             nbtitem.getItem().setItemMeta(meta);
             nbtitem.applyNBT(player.getItemInHand());
             for (Map.Entry<CEnchantment, Integer> entry : crazyenchant.entrySet()) {
-                CrazyEnchantments api = CrazyEnchantments.getInstance();
                 CEnchantment e = entry.getKey();
-                Integer currentench = api.getLevel(player.getItemInHand(), e);
-                api.addEnchantment(player.getItemInHand(), e, currentench + entry.getValue());
+                Integer currentench = Integer.valueOf(LevelTools.crazyenchant_api.getLevel(player.getItemInHand(), e));
+                LevelTools.crazyenchant_api.addEnchantment(player.getItemInHand(), e, currentench.intValue() + ((Integer)entry.getValue()).intValue());
             }
         }
-
-
     }
 }

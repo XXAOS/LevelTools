@@ -11,6 +11,11 @@ settings:
   maxlevel: "&a&lMAX"
   #Changing this requires a server restart
   autosell-hook: false
+  progressbar:
+    filler: "|"
+    bars: 10
+    incomplete_color: "c"
+    complete_color: "a"
   #Enabling this means that this plugin will take full control over the handling of the items lore. All lore/enchant displaying
   #options in your tokenenchant config will be disabled.
   tokenenchant-hook:
@@ -33,6 +38,7 @@ pickaxe:
     - "&7Blocks: &b%blocks%"
     - "&7Level: &b%level% &8(&a%percentage%%&8)"
     - "&7XP: &c%xp% / %xp_needed%"
+    - "&7Progress: &8[%progressbar%&8]"
 
   #How much XP each block should give?
   blocks:
@@ -59,6 +65,7 @@ axe:
     - "&7Blocks: &b%blocks%"
     - "&7Level: &b%level% &8(&a%percentage%%&8)"
     - "&7XP: &c%xp% / %xp_needed%"
+    - "&7Progress: &8[%progressbar%&8]"
 
   #How much XP each block should give?
   #The name of the blocks can vary between minecraft versions Ex: its LOG on 1.8 and OAK_LOG on 1.16
@@ -85,6 +92,7 @@ shovel:
     - "&7Blocks: &b%blocks%"
     - "&7Level: &b%level% &8(&a%percentage%%&8)"
     - "&7XP: &c%xp% / %xp_needed%"
+    - "&7Progress: &8[%progressbar%&8]"
 
   #How much XP each block should give?
 
@@ -113,6 +121,7 @@ sword:
   lore:
     - "&7DAMAGE: &c%damage% / %damage_needed%"
     - "&7Level: &b%level% &8(&a%percentage%%&8)"
+    - "&7Progress: &8[%progressbar%&8]"
 
   disabled_worlds:
     - "example"
@@ -135,6 +144,7 @@ bow:
   lore:
     - "&7DAMAGE: &c%damage% / %damage_needed%"
     - "&7Level: &b%level% &8(&a%percentage%%&8)"
+    - "&7Progress: &8[%progressbar%&8]"
 
   disabled_worlds:
     - "example"
@@ -159,6 +169,7 @@ crossbow:
   lore:
     - "&7DAMAGE: &c%damage% / %damage_needed%"
     - "&7Level: &b%level% &8(&a%percentage%%&8)"
+    - "&7Progress: &8[%progressbar%&8]"
 
   disabled_worlds:
     - "example"
