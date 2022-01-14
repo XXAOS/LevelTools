@@ -14,6 +14,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 public class DamageEvent implements Listener {
     @EventHandler
     public void damage(EntityDamageByEntityEvent event) {
+        if (event.isCancelled()) {return;}
         //BOW
         if (event.getDamager().getType().toString().toLowerCase().contains("arrow") && (((Arrow) event.getDamager()).getShooter()) instanceof Player) {
             Player player = (Player) ((Arrow) event.getDamager()).getShooter();
